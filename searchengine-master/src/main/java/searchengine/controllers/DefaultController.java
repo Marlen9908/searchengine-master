@@ -1,9 +1,11 @@
 package searchengine.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@Slf4j
 public class DefaultController {
 
     /**
@@ -13,6 +15,7 @@ public class DefaultController {
      */
     @RequestMapping("/")
     public String index() {
+        log.info("Переход на главную страницу");
         return "index";
     }
 }

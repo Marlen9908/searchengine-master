@@ -1,63 +1,52 @@
 package searchengine.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
-@Table(
-        name = "lemma",
-        indexes = @Index(name = "lemma_idx", columnList = "lemma")
-)
+@Data
+@Table(name = "lemmas", indexes = {@javax.persistence.Index(name="lemma_id", columnList = "lemma")})
 public class Lemma {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne
     @JoinColumn(name = "site_id", nullable = false)
     private Site site;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String lemma;
 
-    @Column(nullable = false)
-    private int frequency;
+    @Column(columnDefinition = "INT NOT NULL")
+    private volatile Integer frequency;
 
-    @OneToMany(mappedBy = "lemma", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IndexEntity> indexes;
+    @JsonIgnore
+    @OneToMany(mappedBy = "lemma")
+    private List<Index> indexes = new ArrayList<>();
 
-    // ===== getters / setters =====
+    public void increaseFrequency(){++frequency;}
 
-    public Integer getId() {
-        return id;
+    public void decreaseFrequency(){--frequency;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Lemma lemma1)) return false;
+        return getId().equals(lemma1.getId())
+                && getSite().equals(lemma1.getSite())
+                && getLemma().equals(lemma1.getLemma())
+                && getFrequency().equals(lemma1.getFrequency());
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Site getSite() {
-        return site;
-    }
-
-    public void setSite(Site site) {
-        this.site = site;
-    }
-
-    public String getLemma() {
-        return lemma;
-    }
-
-    public void setLemma(String lemma) {
-        this.lemma = lemma;
-    }
-
-    public int getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getSite(), getLemma(), getFrequency());
     }
 }

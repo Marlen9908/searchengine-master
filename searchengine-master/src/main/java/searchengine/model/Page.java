@@ -1,71 +1,54 @@
 package searchengine.model;
 
-
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @Entity
-@Table(
-        name = "page",
-        indexes = @Index(name = "path_idx", columnList = "path")
-)
+@Data
+@Table(name = "pages")
 public class Page {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne
     @JoinColumn(name = "site_id", nullable = false)
     private Site site;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, unique = true, length = 500)
     private String path;
 
-    @Column(nullable = false)
-    private int code;
+    @Column(columnDefinition = "INT NOT NULL")
+    private Integer code;
 
-    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
+    @Column(columnDefinition = "LONGTEXT NOT NULL")
     private String content;
 
-    // ===== getters / setters =====
+    @JsonIgnore
+    @OneToMany(mappedBy = "page")
+    private List<Index> indexes = new ArrayList<>();
 
-    public Integer getId() {
-        return id;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Page page)) return false;
+        return getId().equals(page.getId())
+                && getSite().equals(page.getSite())
+                && getPath().equals(page.getPath())
+                && getCode().equals(page.getCode())
+                && getContent().equals(page.getContent());
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Site getSite() {
-        return site;
-    }
-
-    public void setSite(Site site) {
-        this.site = site;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getSite(), getPath(), getCode(), getContent());
     }
 }

@@ -7,9 +7,11 @@ import searchengine.model.Site;
 import java.util.List;
 import java.util.Optional;
 
-public interface PageRepository extends JpaRepository<Page, Integer> {
+public interface PageRepository extends JpaRepository<Page, Integer>{
 
-    Optional<Page> findBySiteAndPath(Site site, String path);
+    List<Page> findAllBySite(Site site);
 
-    List<Page> findBySite(Site site);
+    Optional<Page> findByPath(String path);
+
+
 }

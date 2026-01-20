@@ -1459,46 +1459,49 @@ var API = function(){
     }
     
     var send = {
-        startIndexing:{
-            address: '/startIndexing',
-            type: 'GET',
-            action: function(result, $this){
-                if (result.result){
-                    if ($this.next('.API-error').length) {
-                        $this.next('.API-error').remove();
-                    }
-                    if ($this.is('[data-btntype="check"]')) {
-                        shiftCheck($this);
-                    }
-                } else {
-                    if ($this.next('.API-error').length) {
-                        $this.next('.API-error').text(result.error);
-                    } else {
-                        $this.after('<div class="API-error">' + result.error + '</div>');
-                    }
-                }
-            }
-        },
-        stopIndexing: {
-            address: '/stopIndexing',
-            type: 'GET',
-            action: function(result, $this){
-                if (result.result){
-                    if ($this.next('.API-error').length) {
-                        $this.next('.API-error').remove();
-                    }
-                    if ($this.is('[data-btntype="check"]')) {
-                        shiftCheck($this);
-                    }
-                } else {
-                    if ($this.next('.API-error').length) {
-                        $this.next('.API-error').text(result.error);
-                    } else {
-                        $this.after('<div class="API-error">' + result.error + '</div>');
-                    }
-                }
-            }
-        },
+        // startIndexing:{
+        //     address: '/startIndexing',
+        //     type: 'GET',
+        //     action: function($this){
+        //         if (result.result){
+        //             if ($this.next('.API-error').length) {
+        //                 $this.next('.API-error').remove();
+        //             }
+        //             if ($this.is('[data-btntype="check"]')) {
+        //                 shiftCheck($this);
+        //             }
+        //         } else {
+        //             if ($this.next('.API-error').length) {
+        //                 $this.next('.API-error').text(result.error);
+        //             } else {
+        //                 $this.after('<div class="API-error">' + result.error + '</div>');
+        //             }
+        //         }
+        //     }
+        //
+        // },
+        // stopIndexing: {
+        //     address: '/stopIndexing',
+        //     type: 'GET',
+        //     action: function(result, $this){
+        //         if ($this.is('[data-btntype="check"]')) {
+        //             shiftCheck($this);
+        //         }
+        //
+        //         if (result.result){
+        //             if ($this.next('.API-error').length) {
+        //                 $this.next('.API-error').remove();
+        //             }
+        //
+        //         } else {
+        //             if ($this.next('.API-error').length) {
+        //                 $this.next('.API-error').text(result.error);
+        //             } else {
+        //                 $this.after('<div class="API-error">' + result.error + '</div>');
+        //             }
+        //         }
+        //     }
+        // },
         indexPage: {
             address: '/indexPage',
             type: 'POST',
@@ -1507,11 +1510,11 @@ var API = function(){
                     if ($this.next('.API-error').length) {
                         $this.next('.API-error').remove();
                     }
-                    if ($this.next('.API-success').length) {
+                    // if ($this.next('.API-success').length) {
                         $this.next('.API-success').text('Страница добавлена/обновлена успешно');
-                    } else {
-                        $this.after('<div class="API-success">Страница поставлена в очередь на обновление / добавление</div>');
-                    }
+                    // } else {
+                    //     $this.after('<div class="API-success">Страница поставлена в очередь на обновление / добавление</div>');
+                    // }
                 } else {
                     if ($this.next('.API-success').length) {
                         $this.next('.API-success').remove();
@@ -1526,7 +1529,7 @@ var API = function(){
         },
         search: {
             address: '/search',
-            type: 'get',
+            type: 'GET',
             action: function(result, $this, data){
                 if (result.result){
                     if ($this.next('.API-error').length) {
@@ -1541,7 +1544,7 @@ var API = function(){
                     var scroll = $(window).scrollTop();
                     result.data.forEach(function(page){
                         $content.append('<div class="SearchResult-block">' +
-                            '<a href="' + page.site + page.uri +'" target="_blank" class="SearchResult-siteTitle">' +
+                            '<a href="' +page.uri +'" target="_blank" class="SearchResult-siteTitle">' +
                                 (!data.siteName ? page.siteName + ' - ': '') +
                                 page.title +
                             '</a>' +

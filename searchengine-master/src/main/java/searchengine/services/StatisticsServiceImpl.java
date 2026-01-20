@@ -1,78 +1,74 @@
 package searchengine.services;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import searchengine.dto.statistics.*;
+import searchengine.config.SiteFromProp;
+import searchengine.config.SitesList;
+import searchengine.dto.statistics.DetailedStatisticsItem;
+import searchengine.dto.statistics.StatisticsData;
+import searchengine.dto.statistics.StatisticsResponse;
+import searchengine.dto.statistics.TotalStatistics;
+import searchengine.model.Page;
 import searchengine.model.Site;
-import searchengine.model.SiteStatus;
-import searchengine.repository.LemmaRepository;
-import searchengine.repository.PageRepository;
+import searchengine.repository.IndexRepository;
 import searchengine.repository.SiteRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService {
 
-    private final SiteRepository siteRepository;
-    private final PageRepository pageRepository;
-    private final LemmaRepository lemmaRepository;
+    @Autowired
+    private SiteRepository siteRepository;
 
-    public StatisticsServiceImpl(SiteRepository siteRepository,
-                                 PageRepository pageRepository,
-                                 LemmaRepository lemmaRepository) {
-        this.siteRepository = siteRepository;
-        this.pageRepository = pageRepository;
-        this.lemmaRepository = lemmaRepository;
-    }
+    @Autowired
+    private IndexRepository indexRepository;
+
+    private final SitesList sites;
+
 
     @Override
     public StatisticsResponse getStatistics() {
 
-        List<Site> sites = siteRepository.findAll();
-
-        int totalPages = 0;
-        int totalLemmas = 0;
-        boolean indexing = false;
+        TotalStatistics total = new TotalStatistics();
+        total.setSites(sites.getSites().size());
+        total.setIndexing(true);
 
         List<DetailedStatisticsItem> detailed = new ArrayList<>();
+        for(SiteFromProp siteFromProp : sites.getSites()) {
+            Site site = siteRepository.findByUrl(siteFromProp.getUrl());
 
-        for (Site site : sites) {
-            int pages = pageRepository.findBySite(site).size();
-            int lemmas = lemmaRepository.countBySite(site);
+            if (site == null) continue;
 
-            totalPages += pages;
-            totalLemmas += lemmas;
+            List<Page> pageList = site.getPages();  // либо из репозитория
 
-            if (site.getStatus() == SiteStatus.INDEXING) {
-                indexing = true;
-            }
+            int pages = pageList.size();
+
+            int lemmas = indexRepository.findAllByPageIn(pageList).size();
 
             DetailedStatisticsItem item = new DetailedStatisticsItem();
-            item.setUrl(site.getUrl());
             item.setName(site.getName());
-            item.setStatus(site.getStatus().name());
-            item.setStatusTime(site.getStatusTime().toEpochSecond(java.time.ZoneOffset.UTC) * 1000);
-            item.setError(site.getLastError());
+            item.setUrl(site.getUrl());
             item.setPages(pages);
             item.setLemmas(lemmas);
+            item.setStatus(site.getStatus().name());
+            item.setError(site.getLastError() == null? "": site.getLastError());
+            item.setStatusTime(site.getStatusTime());
 
+            total.setPages(total.getPages() + pages);
+            total.setLemmas(total.getLemmas() + lemmas);
             detailed.add(item);
         }
 
-        TotalStatistics total = new TotalStatistics();
-        total.setSites(sites.size());
-        total.setPages(totalPages);
-        total.setLemmas(totalLemmas);
-        total.setIndexing(indexing);
-
         StatisticsResponse response = new StatisticsResponse();
+        StatisticsData data = new StatisticsData();
+        data.setTotal(total);
+        data.setDetailed(detailed);
+        response.setStatistics(data);
         response.setResult(true);
-        response.setStatistics(new StatisticsData());
-        response.getStatistics().setTotal(total);
-        response.getStatistics().setDetailed(detailed);
-
         return response;
     }
 }
-

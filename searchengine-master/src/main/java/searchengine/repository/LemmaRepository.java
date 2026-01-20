@@ -1,18 +1,25 @@
 package searchengine.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import searchengine.model.Lemma;
 import searchengine.model.Site;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
-public interface LemmaRepository extends JpaRepository<Lemma, Integer> {
+public interface LemmaRepository extends JpaRepository<Lemma, Integer>{
 
-    Optional<Lemma> findBySiteAndLemma(Site site, String lemma);
+    List<Lemma> findAllBySiteAndLemmaIn(Site site, Set<String> words);
 
-    List<Lemma> findByLemma(String lemma);
+    @Query(value ="SELECT * FROM lemmas WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemmas) / 2) AND site_id = :site ORDER BY frequency", nativeQuery = true)
+    Page<Lemma> findLowFrequencyLemmaSortedAscOneSite(@Param("words")  Set<String> words, @Param("site") Site site, Pageable page);
 
-    int countBySite(Site site);
+    @Query(value ="SELECT * FROM lemmas WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemmas) / 2) ORDER BY frequency", nativeQuery = true)
+    Page<Lemma> findLowFrequencyLemmaSortedAscAllSites(@Param("words")  Set<String> words, Pageable page);
+
+
 }
-
