@@ -3,18 +3,22 @@ server:
   port: 8080
 spring:
   datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/search_engine?useSSL=false&requireSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: admin
-
+    # Меняем драйвер на PostgreSQL
+    driver-class-name: org.postgresql.Driver
+    # Указываем правильный URL (порт 5432) и имя базы
+    url: jdbc:postgresql://localhost:5432/search_engine
+    username: postgres # Ваш логин от postgres (обычно postgres)
+    password: your_password # ВАШ пароль, который вы задали при установке PostgreSQL
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      # меняем update на validate или none, так как таблицы теперь создает Liquibase
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    # Указываем путь к файлу миграций (его сейчас создадим)
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 indexing-settings:
 
