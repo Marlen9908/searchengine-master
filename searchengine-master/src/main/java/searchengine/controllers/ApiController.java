@@ -2,7 +2,6 @@ package searchengine.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.index.IndexResponse;
 import searchengine.dto.index.SearchDto;
@@ -10,6 +9,8 @@ import searchengine.dto.index.SearchResponse;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.IndexService;
 import searchengine.services.StatisticsService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
@@ -41,7 +42,24 @@ public class ApiController {
     }
 
     @GetMapping("/search")
-    public SearchResponse search(SearchDto searchDto) {
+    public SearchResponse search(HttpServletRequest request) {
+        log.info("GET запрос Получение страницы search");
+
+        // Безопасное получение offset (если нет - то 0)
+        String offsetParam = request.getParameter("offset");
+        int offset = (offsetParam == null) ? 0 : Integer.parseInt(offsetParam);
+
+        // Безопасное получение limit (если нет - то 20)
+        String limitParam = request.getParameter("limit");
+        int limit = (limitParam == null) ? 20 : Integer.parseInt(limitParam);
+
+        SearchDto searchDto = SearchDto.builder()
+                .query(request.getParameter("query"))
+                .site(request.getParameter("site"))
+                .offset(offset)
+                .limit(limit)
+                .build();
+
         return indexService.search(searchDto);
     }
 }

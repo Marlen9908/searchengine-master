@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -61,22 +62,39 @@ public class WordService {
     }
 
     public Map<String, Integer> getLemmasMap(String text) {
-        Map<String, Integer> lemmasMap = new WeakHashMap<>();
-        List<String> list = List.of(text.trim().split(" "));
+        Map<String, Integer> lemmasMap = new HashMap<>();
 
-        for (String word : list) {
-            List<String> morphWordsList = luceneMorphology.getNormalForms(word);
-
-            morphWordsList.forEach(morphWord -> {
-                int count = lemmasMap.containsKey(morphWord) ? lemmasMap.get(morphWord) + 1 : 1;
-                lemmasMap.put(morphWord, count);
-            });
+        // Защита от пустой строки
+        if (text == null || text.isBlank()) {
+            return lemmasMap;
         }
-        list.clear();
+
+        // Разбиваем текст на слова
+        String[] words = text.trim().split("\\s+"); // Используем \\s+ чтобы убрать множественные пробелы
+
+        for (String word : words) {
+            // Пропускаем пустые слова
+            if (word.isBlank()) continue;
+
+            try {
+                // Пытаемся получить нормальные формы
+                List<String> morphWordsList = luceneMorphology.getNormalForms(word);
+
+                morphWordsList.forEach(morphWord -> {
+                    int count = lemmasMap.containsKey(morphWord) ? lemmasMap.get(morphWord) + 1 : 1;
+                    lemmasMap.put(morphWord, count);
+                });
+            } catch (Exception e) {
+                // Если библиотека упала на конкретном слове — просто игнорируем это слово и идем дальше
+                // Можно добавить лог, чтобы видеть проблемные слова, но не ERROR, чтобы не спамить
+                // log.warn("Не удалось получить лемму для слова: {}", word);
+            }
+        }
         return lemmasMap;
     }
 
     public String  deleteTagsFromContent(String content){
         return content == null? "" : Jsoup.parse(content).text();
     }
+
 }

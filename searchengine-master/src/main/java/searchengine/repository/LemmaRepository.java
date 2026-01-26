@@ -15,11 +15,13 @@ public interface LemmaRepository extends JpaRepository<Lemma, Integer>{
 
     List<Lemma> findAllBySiteAndLemmaIn(Site site, Set<String> words);
 
-    @Query(value ="SELECT * FROM lemmas WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemmas) / 2) AND site_id = :site ORDER BY frequency", nativeQuery = true)
+    // БЫЛО: FROM lemmas
+    // СТАЛО: FROM lemma
+    @Query(value ="SELECT * FROM lemma WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemma) / 2) AND site_id = :site ORDER BY frequency", nativeQuery = true)
     Page<Lemma> findLowFrequencyLemmaSortedAscOneSite(@Param("words")  Set<String> words, @Param("site") Site site, Pageable page);
 
-    @Query(value ="SELECT * FROM lemmas WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemmas) / 2) ORDER BY frequency", nativeQuery = true)
+    // БЫЛО: FROM lemmas
+    // СТАЛО: FROM lemma
+    @Query(value ="SELECT * FROM lemma WHERE lemma In(:words) AND frequency <= ((select MAX(frequency) FROM lemma) / 2) ORDER BY frequency", nativeQuery = true)
     Page<Lemma> findLowFrequencyLemmaSortedAscAllSites(@Param("words")  Set<String> words, Pageable page);
-
-
 }
