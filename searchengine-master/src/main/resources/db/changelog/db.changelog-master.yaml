@@ -60,7 +60,7 @@ databaseChangeLog:
                     references: site(id)
               - column:
                   name: path
-                  type: text # В Postgres для длинных путей лучше text, или varchar(512)
+                  type: text
                   constraints:
                     nullable: false
               - column:
@@ -70,9 +70,10 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: content
-                  type: text # Для HTML контента
+                  type: mediumtext # Для Postgres автоматически станет TEXT
                   constraints:
                     nullable: false
+        # Индекс для поиска по пути (требование создавать индексы скриптами)
         - createIndex:
             tableName: page
             indexName: idx_page_path
@@ -116,8 +117,9 @@ databaseChangeLog:
       id: 4-create-index-table
       author: student
       changes:
+        #имя таблицы изменено на search_index, так как index - зарезервированное слово
         - createTable:
-            tableName: index
+            tableName: search_index
             columns:
               - column:
                   name: id
@@ -140,8 +142,9 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_index_lemma
                     references: lemma(id)
+
               - column:
-                  name: rank
+                  name: rang
                   type: float
                   constraints:
                     nullable: false

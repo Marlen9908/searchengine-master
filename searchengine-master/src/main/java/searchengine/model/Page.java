@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Data
-@Table(name = "pages")
+@Table(name = "page")
 public class Page {
 
     @Id

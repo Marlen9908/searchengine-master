@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Data
-@Table(name = "lemmas", indexes = {@javax.persistence.Index(name="lemma_id", columnList = "lemma")})
+@Table(name = "lemma", indexes = {@javax.persistence.Index(name="lemma_id", columnList = "lemma")})
 public class Lemma {
 
     @Id

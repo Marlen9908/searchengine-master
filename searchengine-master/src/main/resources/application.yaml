@@ -1,6 +1,6 @@
 
 server:
-  port: 8080
+  port: 8081
 spring:
   datasource:
     # Меняем драйвер на PostgreSQL
@@ -8,7 +8,7 @@ spring:
     # Указываем правильный URL (порт 5432) и имя базы
     url: jdbc:postgresql://localhost:5432/search_engine
     username: postgres # Ваш логин от postgres (обычно postgres)
-    password: your_password # ВАШ пароль, который вы задали при установке PostgreSQL
+    password: 3235556510 # ВАШ пароль, который вы задали при установке PostgreSQL
   jpa:
     hibernate:
       # меняем update на validate или none, так как таблицы теперь создает Liquibase

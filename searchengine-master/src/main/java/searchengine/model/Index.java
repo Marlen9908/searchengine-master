@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Entity
 @Data
-@Table(name = "indexes")
+@Table(name = "search_index")
 public class Index {
 
     @Id
@@ -39,4 +39,5 @@ public class Index {
     public int hashCode() {
         return Objects.hash(getId(), getPage(), getLemma(), getRang());
     }
+
 }
